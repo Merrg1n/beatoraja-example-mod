@@ -1,0 +1,78 @@
+plugins {
+    id 'java'
+    id 'application'
+    id "de.undercouch.download" version "5.6.0"
+}
+
+sourceCompatibility = 8
+targetCompatibility = 8
+
+version = project.mod_version
+group = project.group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://jitpack.io'
+    }
+    maven {
+        url "https://maven.fabricmc.net/"
+    }
+}
+
+var beatorajaFileName = "beatoraja${beatoraja_version}-modernchic"
+
+task downloadBeatoraja(type: Download) {
+    onlyIf { !project.file("run/beatoraja.jar").exists() }
+    src "https://mocha-repository.info/download/${beatorajaFileName}.zip"
+    dest layout.buildDirectory.file("beatoraja.zip")
+}
+
+task unzipBeatoraja(dependsOn: downloadBeatoraja, type: Copy) {
+    onlyIf { !project.file("run/beatoraja.jar").exists() }
+    from zipTree(downloadBeatoraja.dest)
+    into project.file("run")
+    doLast {
+        delete downloadBeatoraja.dest
+    }
+}
+
+task prepareBeatoraja(dependsOn: unzipBeatoraja, type: Copy) {
+    onlyIf { project.file("run/${beatorajaFileName}").isDirectory() }
+    from project.file("run/${beatorajaFileName}")
+    into project.file("run")
+    doLast {
+        delete project.file("run/${beatorajaFileName}")
+    }
+}
+
+compileJava.dependsOn prepareBeatoraja
+
+dependencies {
+    compileOnly files("run/beatoraja.jar")
+    implementation "com.github.merrg1n:beatoraja-fabric-loader:${loader_version}"
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+application {
+    mainClassName = "io.github.merrg1n.beatorajafabric.Main"
+}
+
+run {
+    jvmArgs += [
+            '-Dfabric.development=true',
+            '-Dmixin.debug=true'
+    ]
+    workingDir = file("run")
+}

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "modid",
+  "version": "${version}",
+  "name": "Beatoraja Example Mod",
+  "description": "",
+  "authors": [
+    "Merrg1n"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Merrg1n/beatoraja-fabric-loader"
+  },
+  "license": "MIT",
+  "icon": "assets/modid/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.merrg1n.beatorajaexamplemod.ExampleMod"
+    ]
+  },
+  "mixins": [
+    "modid.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "beatoraja": "0.8.*"
+  }
+}
